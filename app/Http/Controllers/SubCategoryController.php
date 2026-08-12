@@ -14,7 +14,7 @@ class SubCategoryController extends Controller
         return SubCategory::all();
     }
 
-    // Add Sub Category
+    
     public function store(Request $request)
     {
         $subcategory = new SubCategory();
@@ -34,7 +34,7 @@ class SubCategoryController extends Controller
         ]);
     }
 
-    // Update Sub Category
+    
     public function update(Request $request, $id)
     {
         $subcategory = SubCategory::find($id);
@@ -60,7 +60,7 @@ class SubCategoryController extends Controller
         ]);
     }
 
-    // Delete Sub Category
+
     public function destroy($id)
     {
         $subcategory = SubCategory::find($id);

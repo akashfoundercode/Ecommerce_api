@@ -64,7 +64,6 @@ Route::post('address',[AddressController::class,'store']);
 Route::put('address/{id}', [AddressController::class, 'update']);
 Route::delete('address/{id}',[AddressController::class,'destroy']);
 
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders', [OrderController::class, 'index']);
     Route::post('orders', [OrderController::class, 'store']);

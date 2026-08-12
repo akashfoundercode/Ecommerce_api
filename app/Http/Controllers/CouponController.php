@@ -16,7 +16,7 @@ class CouponController extends Controller
     {
         $request->validate([
             'code'=> 'required|unique:coupons,code',
-            'discount_type' => 'required|in:flat,percent',
+            'discount_type' => 'required',
             'discount'=> 'required|numeric|min:0',
         ]);
 

@@ -139,7 +139,7 @@ class OrderController extends Controller
         ]);
     }
 
-    // Get single order detail
+    
     public function show(Request $request, $id)
     {
         $order = Order::where('id', $id)->where('user_id', $request->user()->id)->first();
@@ -159,7 +159,7 @@ class OrderController extends Controller
         ]);
     }
 
-    // Update order status (admin use)
+   
     public function update(Request $request, $id)
     {
         $order = Order::find($id);
@@ -180,7 +180,7 @@ class OrderController extends Controller
         ]);
     }
 
-    // Cancel order
+   
     public function destroy(Request $request, $id)
     {
         $order = Order::where('id', $id)->where('user_id', $request->user()->id)->first();

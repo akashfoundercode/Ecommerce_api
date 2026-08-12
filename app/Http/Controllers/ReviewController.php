@@ -18,7 +18,7 @@ class ReviewController extends Controller
 
         return response()->json([
             "message" => "Reviews List",
-            "data" => $reviews
+            "data"=> $reviews
         ]);
     }
 
@@ -30,7 +30,7 @@ class ReviewController extends Controller
             'comment' => 'nullable|string',
             'status' => 'sometimes|boolean',
         ]);
-
+    
         $review = review::create([
             'user_id' => $request->user()->id,
             'product_id' => $request->product_id,

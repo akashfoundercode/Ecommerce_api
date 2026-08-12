@@ -40,7 +40,7 @@ class OrderitemsController extends Controller
             'items.*.quantity'   => 'required|integer|min:1',
         ]);
 
-        $total_amount = 0;
+        $total_amount= 0;
 
         $order_items = new order_items();
         $order_items->order_id = $request->order_id;
@@ -52,12 +52,12 @@ class OrderitemsController extends Controller
 
        
         return response()->json([
-            "message" => "Order Placed Successfully",
-            "data"    => $order_items
+            "message"=> "Order Placed Successfully",
+            "data"=> $order_items
         ]);
         
     }
-
+ 
     /**
      * Display the specified resource.
      */

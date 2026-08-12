@@ -1,0 +1,202 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Order;
+use App\Models\cart;
+use App\Models\Coupon;
+use App\Models\order_items as OrderItem;
+use App\Models\Payment;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class OrderController extends Controller
+{
+    
+    public function index(Request $request)
+    {
+        $orders = Order::where('user_id', $request->user()->id)->get();
+
+        return response()->json([
+            "message" => "Orders List",
+            "data" => $orders
+        ]);
+    }
+
+   
+    public function store(Request $request)
+    {
+        $request->validate([
+            'address'  => 'required|string',
+            'phone'    => 'required|string',
+            'payment_method' => 'sometimes|string|in:cod',
+            'coupon_code' => 'sometimes|string',
+            'items'    => 'sometimes|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity'   => 'required|integer|min:1',
+        ]);
+
+        $items = $request->items;
+
+        if (!$items) {
+            $items = cart::where('user_id', $request->user()->id)
+                ->get(['product_id', 'quantity'])
+                ->map(function ($item) {
+                    return [
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                    ];
+                })
+                ->toArray();
+        }
+
+        if (empty($items)) {
+            return response()->json([
+                "message" => "Cart is empty."
+            ], 422);
+        }
+
+        $subtotal = 0;
+
+        foreach ($items as $item) {
+            $product = Product::find($item['product_id']);
+            $subtotal += $product->price * $item['quantity'];
+        }
+
+        $discount = 0;
+        $coupon = null;
+
+        if ($request->coupon_code) {
+            $coupon = Coupon::where('code', strtoupper($request->coupon_code))
+                ->where('status', 1)
+                ->first();
+
+            if (!$coupon) {
+                return response()->json([
+                    "message" => "Invalid Coupon Code"
+                ], 422);
+            }
+
+           
+        }
+
+        $total_amount = $subtotal - $discount;
+
+        $order = DB::transaction(function () use ($request, $items, $subtotal, $discount, $total_amount, $coupon) {
+            $order = new Order();
+            $order->user_id= $request->user()->id;
+            $order->order_number= strtoupper(Str::random(10));
+            $order->address_id= $request->address_id ?? $request->address;
+            $order->address = $request->address;
+            $order->phone= $request->phone;
+            $order->subtotal= $subtotal;
+            $order->discount= $discount;
+            $order->delivery_charge = 0;
+            $order->total_amount = $total_amount;
+            $order->coupon_id = $coupon ? $coupon->id : null;
+            $order->coupon_code= $coupon ? $coupon->code : null;
+            $order->payment_method = 'cod';
+            $order->payment_status = 'pending';
+            $order->order_status= 'pending';
+            $order->status= 'pending';
+            $order->save();
+
+            foreach($items as $item) {
+                $product = Product::find($item['product_id']);
+
+                $order_item = new OrderItem();
+                $order_item->order_id = $order->id;
+                $order_item->product_id = $item['product_id'];
+                $order_item->quantity = $item['quantity'];
+                $order_item->price  = $product->price;
+                $order_item->total_price = $product->price * $item['quantity'];
+                $order_item->save();
+            }
+    
+            Payment::create([
+                'order_id' => $order->id,
+                'user_id' => $request->user()->id,
+                'amount' => $total_amount,
+                'payment_method' => 'cod',
+                'payment_status' => 'pending',
+            ]);
+
+            if ($coupon) {
+                $coupon->used_count = $coupon->used_count + 1;
+                $coupon->save();
+            }
+
+            cart::where('user_id', $request->user()->id)->delete();
+
+            return $order;
+        });
+
+        return response()->json([
+            "message" => "COD Order Placed Successfully",
+            "data"    => $order
+        ]);
+    }
+
+    // Get single order detail
+    public function show(Request $request, $id)
+    {
+        $order = Order::where('id', $id)->where('user_id', $request->user()->id)->first();
+
+        if (!$order) {
+            return response()->json([
+                "message" => "Order Not Found"
+            ], 404);
+        }
+
+        $items = OrderItem::where('order_id', $order->id)->get();
+
+        return response()->json([
+            "message" => "Order Detail",
+            "data"    => $order,
+            "items"   => $items
+        ]);
+    }
+
+    // Update order status (admin use)
+    public function update(Request $request, $id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json([
+                "message" => "Order Not Found"
+            ], 404);
+        }
+
+        $order->status = $request->status;
+        $order->order_status = $request->status;
+        $order->save();
+
+        return response()->json([
+            "message" => "Order Status Updated",
+            "data"    => $order
+        ]);
+    }
+
+    // Cancel order
+    public function destroy(Request $request, $id)
+    {
+        $order = Order::where('id', $id)->where('user_id', $request->user()->id)->first();
+
+        if (!$order) {
+            return response()->json([
+                "message" => "Order Not Found"
+            ],404);
+        }
+
+        $order->status= 'cancelled';
+        $order->save();
+
+        return response()->json([
+            "message" => "Order Cancelled Successfully",
+            "data"=> $order
+        ]);
+    }
+}

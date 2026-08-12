@@ -12,7 +12,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        return brand::all();
+        return Brand::all();
 
     }
 
@@ -29,7 +29,7 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        $brand = new brand();
+        $brand = new Brand();
 
         $brand->brand_name = $request->brand_name;
         $brand->slug = $request->slug;
@@ -66,8 +66,16 @@ class BrandController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Brand $brand)
+    public function update(Request $request, $id)
     {
+        $brand = Brand::find($id);
+
+        if (!$brand) {
+            return response()->json([
+                "message" => "Brand Not Found"
+            ], 404);
+        }
+
         $brand->brand_name = $request->brand_name;
         $brand->slug = $request->slug;
         $brand->logo = $request->logo;
@@ -84,8 +92,16 @@ class BrandController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Brand $brand)
+    public function destroy($id)
     {
+        $brand = Brand::find($id);
+
+        if (!$brand) {
+            return response()->json([
+                "message" => "Brand Not Found"
+            ], 404);
+        }
+        
         $brand->delete();
 
         return response()->json([

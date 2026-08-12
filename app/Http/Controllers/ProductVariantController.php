@@ -66,8 +66,16 @@ class ProductVariantController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, product_variant $product_variant)
+    public function update(Request $request, $id)
     {
+        $product_variant = product_variant::find($id);
+
+        if (!$product_variant) {
+            return response()->json([
+                "message" => "Product Variant Not Found"
+            ], 404);
+        }
+
         $product_variant->product_id = $request->product_id;
         $product_variant->color = $request->color;
         $product_variant->size = $request->size;
@@ -88,9 +96,15 @@ class ProductVariantController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(product_variant $product_variant)
+    public function destroy($id)
     {
-        // $product_variant = product_variant::find($id);
+        $product_variant= product_variant::find($id);
+
+        if (!$product_variant) {
+            return response()->json([
+                "message" => "Product Variant Not Found"
+            ], 404);
+        }
 
         $product_variant->delete();
 

@@ -3,70 +3,60 @@
 namespace App\Http\Controllers;
 
 use App\Models\cart;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        return cart::all();
+        return response()->json(
+            cart::where('user_id',
+            $request->user()->id)->get());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $cart = new cart();
+        $request->validate([
+            'product_id'=> 'required|exists:products,id',
+            'quantity'=> 'required|integer|min:1',
+        ]);
 
-        $cart ->user_id  = $request ->user_id;
-        $product-> product_id= $request->product_id;
-         $product->quantity = $request->quantity;
-         $product->price = $request->price;
-         $product->total_price = $request->total_price;
-         $product->save();
+        $product= Product::findOrFail($request->product_id);
+
+        $cart= cart::create([
+            'user_id' => $request->user()->id,
+            'product_id' => $product->id,
+            'quantity'=> $request->quantity,
+            'price'=> $product->price,
+            'total_price'=> $product->price * $request->quantity,
+        ]);
+
+        return response()->json($cart, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(cart $cart)
+    public function update(Request $request, $id)
     {
-        //
+        $cart= cart::where('id', $id)->where('user_id', $request->user()->id)->firstOrFail();
+
+        $request->validate(['quantity'=> 'required|integer|min:1']);
+
+        $cart->update([
+            'quantity'    => $request->quantity,
+            'total_price' => $cart->price * $request->quantity,
+        ]);
+
+        return response()->json($cart);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(cart $cart)
+    public function destroy(Request $request, $id)
     {
-        //
-    }
+        $cart = cart::where('id', $id)->where('user_id', $request->user()->id)->firstOrFail();
+        $cart->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, cart $cart)
-    {
-        //
-    }
+        return response()->json([
+            'message' => 'Removed from cart'
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(cart $cart)
-    {
-        //
-    }
+            ]);
+;    }
 }

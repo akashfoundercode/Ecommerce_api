@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-        
+
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -12,7 +12,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return products::all();
+        return Product::all();
     }
 
     /**
@@ -28,7 +28,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $product = new product();
+        $product = new Product();
 
          $product->category_id = $request->category_id;
          $product->sub_category_id = $request->sub_category_id;
@@ -49,10 +49,9 @@ class ProductController extends Controller
          $product->save();
 
          return response()->json([
-             "message" => "Product Added Successfully",
+             "message" => "Product Updated Successfully",
              "data" => $product
          ]);
-
     }
 
     /**
@@ -74,9 +73,9 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        $product = product::find();
+        $product = Product::find($id);
         
          if (!$product) {
             return response()->json([
@@ -112,9 +111,9 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        $product = product::find($id);
+        $product = Product::find($id);
 
         if(!$product)
             {

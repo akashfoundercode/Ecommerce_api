@@ -13,20 +13,21 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->integer('category_id');
-            $table->integer('sub_category_id');
-            $table->integer('brand_id');
-            $table->string('product_name');
+            $table->integer('category_id')->nullable();
+            $table->integer('sub_category_id')->nullable();
+            $table->integer('brand_id')->nullable();
+            $table->string('name')->nullable();
+            $table->string('product_name')->nullable();
             $table->string('image')->nullable();
-            $table->string('slug');
-            $table->string('sku');
-            $table->string('short_description');
-            $table->string('specification');
+            $table->string('slug')->nullable();
+            $table->string('sku')->nullable();
+            $table->string('short_description')->nullable();
+            $table->string('specification')->nullable();
             $table->decimal('price', 10, 2);
-            $table->decimal('selling_price');
-            $table->string('discount');
-            $table->integer('stock');
-            $table->string('thumbnail');
+            $table->decimal('selling_price', 10, 2)->nullable();
+            $table->string('discount')->nullable();
+            $table->integer('stock')->default(0);
+            $table->string('thumbnail')->nullable();
             $table->boolean('status')->default(1);
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();

@@ -45,12 +45,12 @@ class SubCategoryController extends Controller
             ], 404);
         }
 
-        $subcategory->category_id = $request->category_id;
+        $subcategory->category_id= $request->category_id;
         $subcategory->sub_category_name = $request->sub_category_name;
-        $subcategory->slug = Str::slug($request->sub_category_name);
-        $subcategory->image = $request->image;
+        $subcategory->slug= Str::slug($request->sub_category_name);
+        $subcategory->image= $request->image;
         $subcategory->description = $request->description;
-        $subcategory->status = $request->status;
+        $subcategory->status= $request->status;
 
         $subcategory->save();
 

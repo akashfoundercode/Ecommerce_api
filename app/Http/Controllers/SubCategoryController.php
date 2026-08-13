@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SubCategoryController extends Controller
@@ -22,7 +23,11 @@ class SubCategoryController extends Controller
         $subcategory->category_id = $request->category_id;
         $subcategory->sub_category_name = $request->sub_category_name;
         $subcategory->slug = Str::slug($request->sub_category_name);
-        $subcategory->image = $request->image;
+        if ($request->hasFile('image')) {
+            $subcategory->image = $request->file('image')->store('subcategories', 'public');
+        } elseif ($request->filled('image')) {
+            $subcategory->image = $request->image;
+        }
         $subcategory->description = $request->description;
         $subcategory->status = $request->status;
 
@@ -48,7 +53,14 @@ class SubCategoryController extends Controller
         $subcategory->category_id= $request->category_id;
         $subcategory->sub_category_name = $request->sub_category_name;
         $subcategory->slug= Str::slug($request->sub_category_name);
-        $subcategory->image= $request->image;
+        if ($request->hasFile('image')) {
+            if ($subcategory->image && ! str_starts_with($subcategory->image, 'http')) {
+                Storage::disk('public')->delete($subcategory->image);
+            }
+            $subcategory->image = $request->file('image')->store('subcategories', 'public');
+        } elseif ($request->filled('image')) {
+            $subcategory->image = $request->image;
+        }
         $subcategory->description = $request->description;
         $subcategory->status= $request->status;
 

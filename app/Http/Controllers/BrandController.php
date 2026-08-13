@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
@@ -33,11 +34,13 @@ class BrandController extends Controller
 
         $brand->brand_name = $request->brand_name;
         $brand->slug = $request->slug;
-        $brand->logo = $request->logo;
+        if ($request->hasFile('logo')) {
+            $brand->logo = $request->file('logo')->store('brands', 'public');
+        }
         $brand->description = $request->description;
         $brand->status = $request->status;
 
-        $brand -> save();
+        $brand->save();
 
         return response()->json([
             "message" => "Brand Added Successfully",
@@ -78,7 +81,10 @@ class BrandController extends Controller
 
         $brand->brand_name = $request->brand_name;
         $brand->slug = $request->slug;
-        $brand->logo = $request->logo;
+        if ($request->hasFile('logo')) {
+            if ($brand->logo) Storage::disk('public')->delete($brand->logo);
+            $brand->logo = $request->file('logo')->store('brands', 'public');
+        }
         $brand->description = $request->description;
         $brand->status = $request->status;
         $brand->save();

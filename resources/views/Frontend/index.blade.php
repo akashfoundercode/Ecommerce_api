@@ -81,7 +81,7 @@
           @foreach ($products as $product)
           <div class="product-cart">
             @if ($product->image_url)
-            <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" />
+            <img src="{{ $product->image_url }}" alt="{{ $product->name ?? $product->product_name }}" />
             @else
             <div style="height:260px;display:flex;align-items:center;justify-content:center;background:#f4f4f4;border-radius:20px;color:#777;">No image</div>
             @endif

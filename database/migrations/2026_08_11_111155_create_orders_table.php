@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('order_number');
-            $table->string('address_id');
+            $table->string('address_id')->nullable();
             $table->string('subtotal');
             $table->string('discount');
             $table->string('delivery_charge');

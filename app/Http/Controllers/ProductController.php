@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -34,7 +35,11 @@ class ProductController extends Controller
          $product->sub_category_id = $request->sub_category_id;
          $product->brand_id = $request->brand_id;
          $product->product_name = $request->product_name;
-         $product->image = $request->image;
+         if ($request->hasFile('image')) {
+             $product->image = $request->file('image')->store('products', 'public');
+         } elseif ($request->filled('image')) {
+             $product->image = $request->image;
+         }
          $product->slug = $request->slug;
          $product->sku = $request->sku;
          $product->short_description = $request->short_description;
@@ -44,12 +49,14 @@ class ProductController extends Controller
          $product->selling_price = $request->selling_price;
          $product->discount = $request->discount;
          $product->stock = $request->stock;
-         $product->thumbnail = $request->thumbnail;
+         if ($request->hasFile('thumbnail')) {
+             $product->thumbnail = $request->file('thumbnail')->store('products', 'public');
+         }
          $product->status = $request->status;
          $product->save();
 
          return response()->json([
-             "message" => "Product Updated Successfully",
+             "message" => "Product Added Successfully",
              "data" => $product
          ]);
     }
@@ -87,7 +94,14 @@ class ProductController extends Controller
          $product->sub_category_id = $request->sub_category_id;
          $product->brand_id = $request->brand_id;
          $product->product_name = $request->product_name;
-         $product->image = $request->image;
+         if ($request->hasFile('image')) {
+             if ($product->image && ! str_starts_with($product->image, 'http')) {
+                 Storage::disk('public')->delete($product->image);
+             }
+             $product->image = $request->file('image')->store('products', 'public');
+         } elseif ($request->filled('image')) {
+             $product->image = $request->image;
+         }
          $product->slug = $request->slug;
          $product->sku = $request->sku;
          $product->short_description = $request->short_description;
@@ -97,12 +111,15 @@ class ProductController extends Controller
          $product->selling_price = $request->selling_price;
          $product->discount = $request->discount;
          $product->stock = $request->stock;
-         $product->thumbnail = $request->thumbnail;
+         if ($request->hasFile('thumbnail')) {
+             if ($product->thumbnail) Storage::disk('public')->delete($product->thumbnail);
+             $product->thumbnail = $request->file('thumbnail')->store('products', 'public');
+         }
          $product->status = $request->status;
          $product->save();
 
          return response()->json([
-             "message" => "Product Added Successfully",
+             "message" => "Product Updated Successfully",
              "data" => $product
          ]);
 

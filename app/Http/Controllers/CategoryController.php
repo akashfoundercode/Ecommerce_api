@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -21,7 +22,9 @@ class CategoryController extends Controller
 
         $category->name = $request->name;
         $category->slug = Str::slug($request->name);
-        $category->image = $request->image;
+        if ($request->hasFile('image')) {
+            $category->image = $request->file('image')->store('categories', 'public');
+        }
         $category->description = $request->description;
         $category->status = $request->status;
 
@@ -46,7 +49,10 @@ class CategoryController extends Controller
 
         $category->name = $request->name;
         $category->slug = Str::slug($request->name);
-        $category->image = $request->image;
+        if ($request->hasFile('image')) {
+            if ($category->image) Storage::disk('public')->delete($category->image);
+            $category->image = $request->file('image')->store('categories', 'public');
+        }
         $category->description = $request->description;
         $category->status = $request->status;
 

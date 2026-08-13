@@ -22,7 +22,7 @@
             <div class="row align-items-center g-4">
                 <div class="col-lg-6">
                     <h1 class="display-5 fw-bold">Simple Ecommerce Frontend</h1>
-                    <p class="lead text-muted">Static products ke saath admin panel se add hua product bhi yahin show hoga.</p>
+                    <p class="lead text-muted">Products added from the admin panel will appear here with the static products.</p>
                     <a href="#products" class="btn btn-success">Shop Now</a>
                 </div>
                 <div class="col-lg-6">
@@ -38,7 +38,7 @@
     <main class="container py-5" id="products">
         <div class="text-center mb-4">
             <h2 class="fw-bold">Products</h2>
-            <p class="text-muted">Static products + admin se add kiye gaye products.</p>
+            <p class="text-muted">Static products plus products added from the admin panel.</p>
         </div>
 
         @php

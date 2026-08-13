@@ -78,7 +78,7 @@ class ReviewController extends Controller
         ]);
 
         $review->update($request->only(['rating', 'comment', 'status']));
-
+        
         return response()->json([
             "message" => "Review Updated Successfully",
             "data" => $review
@@ -93,6 +93,7 @@ class ReviewController extends Controller
             return response()->json([
                 "message" => "Review Not Found"
             ], 404);
+
         }
 
         $review->delete();

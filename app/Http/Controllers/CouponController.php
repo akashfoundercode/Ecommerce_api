@@ -54,6 +54,17 @@ class CouponController extends Controller
             ], 404);
         }
 
+        if ($coupon->min_order_amount > 0 && $request->total_amount < $coupon->min_order_amount) {
+            return response()->json([
+                "message" => "Minimum order amount is " . $coupon->min_order_amount
+            ], 422);
+        }
+
+        if ($coupon->discount_type == 'percent') {
+            $discount = ($request->total_amount * $coupon->discount) / 100;
+        } else {
+            $discount = $coupon->discount;
+        }
 
         return response()->json([
             "message" => "Coupon Applied Successfully",

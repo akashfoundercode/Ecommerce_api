@@ -50,10 +50,10 @@ class AuthController extends Controller
             'message'=>'login successfully',
             'token'=>$token,
             'Data'=>$user,
-            'url'=>$user->profile_photo ? asset('storage/'.$user->profile_photo) : null,
+            'url'=>$user->profile_photo ? asset('storage/' . $user->profile_photo) : null,
         ]);
     }
-
+    
     public function profile(Request $request)
     {
         $user = $request->user();

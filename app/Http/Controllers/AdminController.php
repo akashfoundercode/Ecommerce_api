@@ -118,7 +118,7 @@ class AdminController extends Controller
         return redirect()->route('admin.products')->with('success', 'Product deleted successfully.');
     }
 
-    
+  
     public function categories()
     {
         return view('admin.categories.index', ['items' => Category::latest()->get()]);
@@ -178,7 +178,7 @@ class AdminController extends Controller
         SubCategory::create($data);
         return redirect()->route('admin.subcategories')->with('success', 'Sub-category added successfully.');
     }
-    
+
     public function editSubcategory(SubCategory $subcategory)
     {
         return view('admin.subcategories.edit', ['item' => $subcategory, 'categories' => Category::all()]);
@@ -338,6 +338,7 @@ class AdminController extends Controller
     {
         $data = $request->validate(['product_id' => 'required|exists:products,id', 'color' => 'nullable|string', 'size' => 'nullable|string', 'stock' => 'nullable|integer', 'price' => 'required|numeric', 'status' => 'nullable|boolean']);
         $productVariant->update($data);
+        
         return redirect()->route('admin.product-variants')->with('success', 'Variant updated successfully.');
     }
 
